@@ -135,7 +135,7 @@ fun Pie(listOfSlices: List<SliceItem>, backgroundColor: Color, onclick: (SliceIt
                     p1 = Coordinate(center.x, center.y)
 
                     val startingPoint =
-                        Coordinate(size.width, size.minDimension.div(2))
+                        Coordinate(size.width.plus(100.dp.value), size.minDimension.div(2))
 
                     p2 = rotatePoint(
                         sliceItem.startAngleInDegrees.plus(rotation),
