@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -30,15 +31,16 @@ fun Pie(listOfSlices: List<SliceItem>, backgroundColor: Color, onclick: (SliceIt
 
     val mContext = LocalContext.current
 
-    val rotation = 0F
+    val arcAngle = 360F / listOfSlices.size
+
+    val rotation = -arcAngle
+        .div(4).plus(arcAngle)
 
     Canvas(modifier = Modifier
         .fillMaxSize()
         .background(color = Color(0xFF212121))
         .aspectRatio(1F)
         .drawBehind {
-
-            val arcAngle = 360F / listOfSlices.size
             rotate(rotation) {
                 listOfSlices.forEach {
                     drawContext.canvas.nativeCanvas.apply {
@@ -91,17 +93,11 @@ fun Pie(listOfSlices: List<SliceItem>, backgroundColor: Color, onclick: (SliceIt
         },
         onDraw = {
 
-            val arcAngle = 360F / listOfSlices.size
-
             // Draw Outer Border for Composable
-//            drawRect(color = Color.Red, style = Stroke(width = 5.dp.value))
+            // drawRect(color = Color.Red, style = Stroke(width = 5.dp.value))
 
             // Draw Circular Outer Border for Composable
             // drawCircle(color = Color.Red, style = Stroke(width = 5.dp.value))
-
-//            val rotation = arcAngle
-//                .div(4)
-//                .plus(arcAngle.div(2))
 
             rotate(rotation) {
 
@@ -123,60 +119,64 @@ fun Pie(listOfSlices: List<SliceItem>, backgroundColor: Color, onclick: (SliceIt
                         size = size
                             .times(strength)
                             .offsetSize(Offset(x, y))
-                    ).also {
-                        // Update the clickable triangle for each Slice Item
-                        sliceItem.triangleWithPoints.apply {
-                            p1 = Coordinate(center.x, center.y)
-
-                            val startingPoint =
-                                Coordinate(size.width, size.minDimension.div(2))
-
-                            p2 = rotatePoint(sliceItem.startAngleInDegrees.plus(rotation), startingPoint, center)
-
-                            p3 = rotatePoint(
-                                arcAngle,
-                                Coordinate(p2.x, p2.y),
-                                center
-                            )
-
-                            // TO preview clickable areas
-
-//                            drawCircle(
-//                                color = Color.White.copy(alpha = 0.5F),
-//                                radius = 30F,
-//                                center = Offset(p1.x, p1.y)
-//                            )
-//                            drawCircle(
-//                                color = Color.White.copy(alpha = 0.5F),
-//                                radius = 30F,
-//                                center = Offset(p2.x, p2.y)
-//                            )
-//                            drawCircle(
-//                                color = Color.White.copy(alpha = 0.5F),
-//                                radius = 30F,
-//                                center = Offset(p3.x, p3.y)
-//                            )
-//
-//                            drawPath(
-//                                color = Color.White.copy(alpha = 0.5F),
-//                                path = Path().apply {
-//                                    moveTo(p1.x, p1.y)
-//                                    lineTo(p2.x, p2.y)
-//                                    lineTo(p3.x, p3.y)
-//                                    this.close()
-//                                })
-                        }
-                    }
+                    )
                 }
             }
 
             // Draw Concentric Circles denoting levels
             drawConcentricCircles()
 
-            //Draw Grout
+            // Draw Grout
             drawGrout(listOfSlices, backgroundColor, rotation)
 
+            // Update clickable areas
+            listOfSlices.forEach { sliceItem ->
+                sliceItem.triangleWithPoints.apply {
+                    p1 = Coordinate(center.x, center.y)
 
+                    val startingPoint =
+                        Coordinate(size.width, size.minDimension.div(2))
+
+                    p2 = rotatePoint(
+                        sliceItem.startAngleInDegrees.plus(rotation),
+                        startingPoint,
+                        center
+                    )
+
+                    p3 = rotatePoint(
+                        arcAngle,
+                        Coordinate(p2.x, p2.y),
+                        center
+                    )
+
+                    // Uncomment to preview clickable areas
+
+//                    drawCircle(
+//                        color = Color.White.copy(alpha = 0.5F),
+//                        radius = 30F,
+//                        center = Offset(p1.x, p1.y)
+//                    )
+//                    drawCircle(
+//                        color = Color.White.copy(alpha = 0.5F),
+//                        radius = 30F,
+//                        center = Offset(p2.x, p2.y)
+//                    )
+//                    drawCircle(
+//                        color = Color.White.copy(alpha = 0.5F),
+//                        radius = 30F,
+//                        center = Offset(p3.x, p3.y)
+//                    )
+//
+//                    drawPath(
+//                        color = Color.White.copy(alpha = 0.5F),
+//                        path = Path().apply {
+//                            moveTo(p1.x, p1.y)
+//                            lineTo(p2.x, p2.y)
+//                            lineTo(p3.x, p3.y)
+//                            this.close()
+//                        })
+                }
+            }
         }
     )
 }
